@@ -11,7 +11,7 @@ type Task struct {
 }
 
 type Storage struct {
-	tasks []Task
+	tasks  []Task
 	nextID int
 }
 
@@ -19,7 +19,7 @@ var ErrTitleEmpty = errors.New("title cannot be empty")
 var ErrNotFound = errors.New("task not found")
 
 func (s *Storage) Add(title string) (Task, error) {
-	
+
 	if title == "" {
 		return Task{}, ErrTitleEmpty
 	}
@@ -29,23 +29,23 @@ func (s *Storage) Add(title string) (Task, error) {
 		Done:  false,
 	}
 	s.tasks = append(s.tasks, task)
-	s.nextID+=1
+	s.nextID += 1
 	return task, nil
 }
 
 func (s *Storage) Get(id int) (Task, error) {
 	for _, task := range s.tasks {
-		if task.ID==id{
+		if task.ID == id {
 			return task, nil
 		}
 	}
 	return Task{}, ErrNotFound
 }
 
-func (s *Storage) MarkDone(id int) error{
-	for i:=0;i<len(s.tasks);i++{
-		if s.tasks[i].ID==id{
-			s.tasks[i].Done=true
+func (s *Storage) MarkDone(id int) error {
+	for i := 0; i < len(s.tasks); i++ {
+		if s.tasks[i].ID == id {
+			s.tasks[i].Done = true
 			return nil
 		}
 	}
@@ -54,6 +54,6 @@ func (s *Storage) MarkDone(id int) error{
 
 func (s *Storage) List() []Task {
 	var c []Task
-	c=append(c, s.tasks...)
+	c = append(c, s.tasks...)
 	return c
 }

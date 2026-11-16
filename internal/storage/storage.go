@@ -1,7 +1,8 @@
 package storage
 
-import "fmt"
-
+import (
+	"errors"
+)
 type Task struct {
 	ID    int
 	Title string
@@ -13,8 +14,9 @@ type Storage struct {
 }
 
 func (s *Storage) Add(title string) (Task, error) {
+	var ErrTitleEmpty = errors.New("Title cannot be empty")
 	if title == "" {
-		return Task{}, fmt.Errorf("Title cannot be empty")
+		return Task{}, ErrTitleEmpty
 	}
 	task := Task{
 		ID:    len(s.tasks) + 1,
@@ -26,22 +28,24 @@ func (s *Storage) Add(title string) (Task, error) {
 }
 
 func (s Storage) Get(id int) (Task, error) {
+	var ErrNotFound = errors.New("not found")
 	for _, task := range s.tasks {
 		if task.ID==id{
 			return task, nil
 		}
 	}
-	return Task{}, fmt.Errorf("Not found")
+	return Task{}, ErrNotFound
 }
 
 func (s *Storage) MarkDone(id int) error{
+	var ErrNotFound = errors.New("not found")
 	for i:=0;i<len(s.tasks);i++{
 		if s.tasks[i].ID==id{
 			s.tasks[i].Done=true
 			return nil
 		}
 	}
-	return fmt.Errorf("Not found")
+	return ErrNotFound
 }
 
 func (s Storage) List() []Task {

@@ -12,6 +12,7 @@ type Task struct {
 
 type Storage struct {
 	tasks []Task
+	nextId int
 }
 
 var ErrTitleEmpty = errors.New("Title cannot be empty")
@@ -23,11 +24,12 @@ func (s *Storage) Add(title string) (Task, error) {
 		return Task{}, ErrTitleEmpty
 	}
 	task := Task{
-		ID:    len(s.tasks) + 1,
+		ID:    s.nextId + 1,
 		Title: title,
 		Done:  false,
 	}
 	s.tasks = append(s.tasks, task)
+	s.nextId+=1
 	return task, nil
 }
 

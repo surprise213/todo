@@ -35,9 +35,9 @@ func (s Storage) Get(id int) (Task, error) {
 }
 
 func (s *Storage) MarkDone(id int) error{
-	for _, task := range s.tasks{
-		if task.ID==id{
-			task.Done=true
+	for i:=0;i<len(s.tasks);i++{
+		if s.tasks[i].ID==id{
+			s.tasks[i].Done=true
 			return nil
 		}
 	}

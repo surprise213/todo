@@ -31,7 +31,7 @@ func (s *Storage) Add(title string) (Task, error) {
 	return task, nil
 }
 
-func (s Storage) Get(id int) (Task, error) {
+func (s *Storage) Get(id int) (Task, error) {
 	for _, task := range s.tasks {
 		if task.ID==id{
 			return task, nil
@@ -50,6 +50,8 @@ func (s *Storage) MarkDone(id int) error{
 	return ErrNotFound
 }
 
-func (s Storage) List() []Task {
-	return s.tasks
+func (s *Storage) List() []Task {
+	var c []Task
+	c=append(c, s.tasks...)
+	return c
 }

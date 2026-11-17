@@ -26,6 +26,10 @@ func main() {
 	var s storage.Storage
 	_, err := s.Add("Golang")
 	HandleErrTitleEmpty(err)
+	_, err = s.Add("C++")
+	HandleErrTitleEmpty(err)
+	_, err = s.Add("C#")
+	HandleErrTitleEmpty(err)
 
 	_, err = s.Get(1)
 	HandleErrNotFound(err)
@@ -36,13 +40,18 @@ func main() {
 	_, err = s.Get(42)
 	HandleErrNotFound(err)
 
-	_, err = s.Add("C++")
-	HandleErrTitleEmpty(err)
+	err = s.Delete(2)
+	HandleErrNotFound(err)
 
 	fmt.Println(s.List())
 
 	err = s.Delete(2)
 	HandleErrNotFound(err)
+
+	fmt.Println(s.List())
+
+	_, err = s.Add("Python")
+	HandleErrTitleEmpty(err)
 
 	fmt.Println(s.List())
 }

@@ -57,3 +57,13 @@ func (s *Storage) List() []Task {
 	c = append(c, s.tasks...)
 	return c
 }
+
+func (s *Storage) Delete(id int) error {
+	for i := range s.tasks {
+		if s.tasks[i].ID == id {
+			s.tasks = append(s.tasks[:i], s.tasks[i+1:]...)
+			return nil
+		}
+	}
+	return ErrNotFound
+}

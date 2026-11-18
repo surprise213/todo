@@ -40,18 +40,29 @@ func run(args []string) error {
 		if len(args) < 2 {
 			return errors.New("использование: add <задание>")
 		}
-		task := strings.Join(args[2:], " ")
+		task := strings.Join(args[1:], " ")
 		task = strings.TrimSpace(task)
-		_, err := s.Add(task)
+		t, err := s.Add(task)
 		if err != nil {
 			return err
 		}
+		fmt.Printf("добавлена задача %x %s", t.ID, t.Title)
 
 	case "list":
 		if len(args) != 1 {
 			return errors.New("использование: list")
 		}
-		fmt.Println(s.List())
+		var builder strings.Builder
+		tasks := s.List()
+		for i := range tasks {
+			if tasks[i].Done {
+				builder.WriteString("[+] " + strconv.Itoa(tasks[i].ID) + ". " + tasks[i].Title + "\n")
+			} else {
+				builder.WriteString("[ ] " + strconv.Itoa(tasks[i].ID) + ". " + tasks[i].Title + "\n")
+			}
+		}
+		res := builder.String()
+		fmt.Println(res)
 
 	case "done":
 		if len(args) != 2 {

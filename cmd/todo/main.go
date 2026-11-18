@@ -3,55 +3,83 @@ package main
 import (
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
 
 	"github.com/surprise213/todo/internal/storage"
 )
 
-func HandleErrTitleEmpty(err error) {
-	if errors.Is(err, storage.ErrTitleEmpty) {
-		fmt.Println(storage.ErrTitleEmpty)
-	} else if err != nil {
-		fmt.Println("Error: ", err)
-	}
-}
-func HandleErrNotFound(err error) {
-	if errors.Is(err, storage.ErrNotFound) {
-		fmt.Println(storage.ErrNotFound)
-	} else if err != nil {
-		fmt.Println("Error: ", err)
-	}
-}
+var s = storage.Storage{}
+
+// func HandleErr(err error) {
+// 	if errors.Is(err, storage.ErrTitleEmpty) {
+// 		fmt.Println(storage.ErrTitleEmpty)
+// 	} else if errors.Is(err, storage.ErrNotFound) {
+// 		fmt.Println(storage.ErrNotFound)
+// 	} else if err != nil {
+// 		fmt.Println("Error: ", err)
+// 	}
+// }
 
 func main() {
-	var s storage.Storage
-	_, err := s.Add("Golang")
-	HandleErrTitleEmpty(err)
-	_, err = s.Add("C++")
-	HandleErrTitleEmpty(err)
-	_, err = s.Add("C#")
-	HandleErrTitleEmpty(err)
+	s.Add("Golang")
+	if err := run(os.Args[1:]); err != nil {
+		fmt.Fprintln(os.Stderr, "ошибка:", err)
+		os.Exit(1)
+	}
+}
 
-	_, err = s.Get(1)
-	HandleErrNotFound(err)
+func run(args []string) error {
+	if len(args) == 0 {
+		return errors.New("не указана команда\nиcпoльзoвaниe: add, list, done, delete")
+	}
 
-	err = s.MarkDone(1)
-	HandleErrNotFound(err)
+	switch args[0] {
+	case "add":
+		if len(args) < 2 {
+			return errors.New("использование: add <задание>")
+		}
+		task := strings.Join(args[2:], " ")
+		task = strings.TrimSpace(task)
+		_, err := s.Add(task)
+		if err != nil {
+			return err
+		}
 
-	_, err = s.Get(42)
-	HandleErrNotFound(err)
+	case "list":
+		if len(args) != 1 {
+			return errors.New("использование: list")
+		}
+		fmt.Println(s.List())
 
-	err = s.Delete(2)
-	HandleErrNotFound(err)
+	case "done":
+		if len(args) != 2 {
+			return errors.New("использование: done <id>")
+		}
+		id, err := strconv.Atoi(args[1])
+		if err != nil {
+			return fmt.Errorf("неверный id %q: %w", args[1], err)
+		}
+		err = s.MarkDone(id)
+		if err != nil {
+			return err
+		}
 
-	fmt.Println(s.List())
-
-	err = s.Delete(2)
-	HandleErrNotFound(err)
-
-	fmt.Println(s.List())
-
-	_, err = s.Add("Python")
-	HandleErrTitleEmpty(err)
-
-	fmt.Println(s.List())
+	case "delete":
+		if len(args) != 2 {
+			return errors.New("использование: delete <id>")
+		}
+		id, err := strconv.Atoi(args[1])
+		if err != nil {
+			return fmt.Errorf("после delete должно быть id")
+		}
+		err = s.Delete(id)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("неизвестная команда %q", args[0])
+	}
+	return nil
 }

@@ -18,9 +18,9 @@ func main() {
 }
 
 func run(args []string) error {
-	var s = storage.Storage{}
+	var s storage.Storage
 	if len(args) == 0 {
-		return errors.New("не указана команда\n использование: add, list, done, delete")
+		return errors.New("не указана команда\nиспользование: add, list, done, delete")
 	}
 
 	switch args[0] {
@@ -34,7 +34,7 @@ func run(args []string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("добавлена задача %x %s", t.ID, t.Title)
+		fmt.Printf("добавлена задача %d %s", t.ID, t.Title+"\n")
 
 	case "list":
 		if len(args) != 1 {
@@ -42,15 +42,19 @@ func run(args []string) error {
 		}
 		var builder strings.Builder
 		tasks := s.List()
-		for i := range tasks {
-			if tasks[i].Done {
-				builder.WriteString("[+] " + strconv.Itoa(tasks[i].ID) + ". " + tasks[i].Title + "\n")
-			} else {
-				builder.WriteString("[ ] " + strconv.Itoa(tasks[i].ID) + ". " + tasks[i].Title + "\n")
+		if len(tasks) == 0 {
+			fmt.Println("список пуст")
+			return nil
+		}
+		for _, t := range tasks {
+			mark := "[ ]"
+			if t.Done {
+				mark = "[x]"
 			}
+			fmt.Fprintf(&builder, "%s %d. %s\n", mark, t.ID, t.Title)
 		}
 		res := builder.String()
-		fmt.Println(res)
+		fmt.Print(res)
 
 	case "done":
 		if len(args) != 2 {

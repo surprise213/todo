@@ -10,20 +10,7 @@ import (
 	"github.com/surprise213/todo/internal/storage"
 )
 
-var s = storage.Storage{}
-
-// func HandleErr(err error) {
-// 	if errors.Is(err, storage.ErrTitleEmpty) {
-// 		fmt.Println(storage.ErrTitleEmpty)
-// 	} else if errors.Is(err, storage.ErrNotFound) {
-// 		fmt.Println(storage.ErrNotFound)
-// 	} else if err != nil {
-// 		fmt.Println("Error: ", err)
-// 	}
-// }
-
 func main() {
-	s.Add("Golang")
 	if err := run(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, "ошибка:", err)
 		os.Exit(1)
@@ -31,8 +18,9 @@ func main() {
 }
 
 func run(args []string) error {
+	var s = storage.Storage{}
 	if len(args) == 0 {
-		return errors.New("не указана команда\nиcпoльзoвaниe: add, list, done, delete")
+		return errors.New("не указана команда\n использование: add, list, done, delete")
 	}
 
 	switch args[0] {
@@ -83,7 +71,7 @@ func run(args []string) error {
 		}
 		id, err := strconv.Atoi(args[1])
 		if err != nil {
-			return fmt.Errorf("после delete должно быть id")
+			return fmt.Errorf("неверный id %q: %w", args[1], err)
 		}
 		err = s.Delete(id)
 		if err != nil {

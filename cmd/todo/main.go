@@ -10,15 +10,24 @@ import (
 	"github.com/surprise213/todo/internal/storage"
 )
 
+type Repository interface {
+	Add(title string) (storage.Task, error)
+	List() []storage.Task
+	MarkDone(id int) error
+	Delete(id int) error
+}
+
+var _ Repository = (*storage.MemoryStorage)(nil)
+
 func main() {
-	if err := run(os.Args[1:]); err != nil {
+	var s Repository = storage.NewMemoryStorage()
+	if err := run(os.Args[1:], s); err != nil {
 		fmt.Fprintln(os.Stderr, "ошибка:", err)
 		os.Exit(1)
 	}
 }
 
-func run(args []string) error {
-	var s storage.Storage
+func run(args []string, repo Repository) error {
 	if len(args) == 0 {
 		return errors.New("не указана команда\nиспользование: add, list, done, delete")
 	}
@@ -30,7 +39,7 @@ func run(args []string) error {
 		}
 		task := strings.Join(args[1:], " ")
 		task = strings.TrimSpace(task)
-		t, err := s.Add(task)
+		t, err := repo.Add(task)
 		if err != nil {
 			return err
 		}
@@ -41,17 +50,13 @@ func run(args []string) error {
 			return errors.New("использование: list")
 		}
 		var builder strings.Builder
-		tasks := s.List()
+		tasks := repo.List()
 		if len(tasks) == 0 {
 			fmt.Println("список пуст")
 			return nil
 		}
 		for _, t := range tasks {
-			mark := "[ ]"
-			if t.Done {
-				mark = "[x]"
-			}
-			fmt.Fprintf(&builder, "%s %d. %s\n", mark, t.ID, t.Title)
+			fmt.Fprint(&builder, t)
 		}
 		res := builder.String()
 		fmt.Print(res)
@@ -64,7 +69,7 @@ func run(args []string) error {
 		if err != nil {
 			return fmt.Errorf("неверный id %q: %w", args[1], err)
 		}
-		err = s.MarkDone(id)
+		err = repo.MarkDone(id)
 		if err != nil {
 			return err
 		}
@@ -77,7 +82,7 @@ func run(args []string) error {
 		if err != nil {
 			return fmt.Errorf("неверный id %q: %w", args[1], err)
 		}
-		err = s.Delete(id)
+		err = repo.Delete(id)
 		if err != nil {
 			return err
 		}

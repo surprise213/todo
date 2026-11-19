@@ -2,6 +2,8 @@ package storage
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 )
 
 type Task struct {
@@ -10,7 +12,7 @@ type Task struct {
 	Done  bool
 }
 
-type Storage struct {
+type MemoryStorage struct {
 	tasks  []Task
 	nextID int
 }
@@ -18,7 +20,11 @@ type Storage struct {
 var ErrTitleEmpty = errors.New("title cannot be empty")
 var ErrNotFound = errors.New("task not found")
 
-func (s *Storage) Add(title string) (Task, error) {
+func NewMemoryStorage() *MemoryStorage {
+	return &MemoryStorage{}
+}
+
+func (s *MemoryStorage) Add(title string) (Task, error) {
 
 	if title == "" {
 		return Task{}, ErrTitleEmpty
@@ -33,7 +39,7 @@ func (s *Storage) Add(title string) (Task, error) {
 	return task, nil
 }
 
-func (s *Storage) Get(id int) (Task, error) {
+func (s *MemoryStorage) Get(id int) (Task, error) {
 	for _, task := range s.tasks {
 		if task.ID == id {
 			return task, nil
@@ -42,7 +48,7 @@ func (s *Storage) Get(id int) (Task, error) {
 	return Task{}, ErrNotFound
 }
 
-func (s *Storage) MarkDone(id int) error {
+func (s *MemoryStorage) MarkDone(id int) error {
 	for i := 0; i < len(s.tasks); i++ {
 		if s.tasks[i].ID == id {
 			s.tasks[i].Done = true
@@ -52,13 +58,13 @@ func (s *Storage) MarkDone(id int) error {
 	return ErrNotFound
 }
 
-func (s *Storage) List() []Task {
+func (s *MemoryStorage) List() []Task {
 	var c []Task
 	c = append(c, s.tasks...)
 	return c
 }
 
-func (s *Storage) Delete(id int) error {
+func (s *MemoryStorage) Delete(id int) error {
 	for i := range s.tasks {
 		if s.tasks[i].ID == id {
 			s.tasks = append(s.tasks[:i], s.tasks[i+1:]...)
@@ -66,4 +72,15 @@ func (s *Storage) Delete(id int) error {
 		}
 	}
 	return ErrNotFound
+}
+
+func (t *Task) String() string {
+	var builder strings.Builder
+	mark := "[ ]"
+	if t.Done {
+		mark = "[x]"
+	}
+	fmt.Fprintf(&builder, "%s %d. %s\n", mark, t.ID, t.Title)
+	res := builder.String()
+	return res
 }

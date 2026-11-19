@@ -20,8 +20,8 @@ type Repository interface {
 var _ Repository = (*storage.MemoryStorage)(nil)
 
 func main() {
-	s := storage.NewMemoryStorage()
-	if err := run(os.Args[1:], s); err != nil {
+	repo := storage.NewMemoryStorage()
+	if err := run(os.Args[1:], repo); err != nil {
 		fmt.Fprintln(os.Stderr, "ошибка:", err)
 		os.Exit(1)
 	}

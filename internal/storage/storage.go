@@ -80,7 +80,7 @@ func (t *Task) String() string {
 	if t.Done {
 		mark = "[x]"
 	}
-	fmt.Fprintf(&builder, "%s %d. %s\n", mark, t.ID, t.Title)
+	fmt.Fprintf(&builder, "%s %d. %s", mark, t.ID, t.Title)
 	res := builder.String()
 	return res
 }

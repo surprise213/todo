@@ -20,7 +20,7 @@ type Repository interface {
 var _ Repository = (*storage.MemoryStorage)(nil)
 
 func main() {
-	var s Repository = storage.NewMemoryStorage()
+	s := storage.NewMemoryStorage()
 	if err := run(os.Args[1:], s); err != nil {
 		fmt.Fprintln(os.Stderr, "ошибка:", err)
 		os.Exit(1)
@@ -56,7 +56,7 @@ func run(args []string, repo Repository) error {
 			return nil
 		}
 		for _, t := range tasks {
-			fmt.Fprint(&builder, t)
+			fmt.Fprint(&builder, &t)
 		}
 		res := builder.String()
 		fmt.Print(res)

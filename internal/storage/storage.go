@@ -74,7 +74,7 @@ func (s *MemoryStorage) Delete(id int) error {
 	return ErrNotFound
 }
 
-func (t *Task) String() string {
+func (t Task) String() string {
 	var builder strings.Builder
 	mark := "[ ]"
 	if t.Done {

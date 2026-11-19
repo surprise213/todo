@@ -56,7 +56,7 @@ func run(args []string, repo Repository) error {
 			return nil
 		}
 		for _, t := range tasks {
-			fmt.Fprint(&builder, &t)
+			fmt.Fprintln(&builder, t)
 		}
 		res := builder.String()
 		fmt.Print(res)

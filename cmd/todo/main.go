@@ -18,11 +18,20 @@ type Repository interface {
 }
 
 var _ Repository = (*storage.MemoryStorage)(nil)
+var _ Repository = (*storage.FileStorage)(nil)
 
 func main() {
-	repo := storage.NewMemoryStorage()
+	repo, err := storage.NewFileStorage("tasks.json")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "ошибка:", err)
+		os.Exit(1)
+	}
+
 	if err := run(os.Args[1:], repo); err != nil {
 		fmt.Fprintln(os.Stderr, "ошибка:", err)
+		if errors.Is(err, storage.ErrNotFound) {
+			os.Exit(2)
+		}
 		os.Exit(1)
 	}
 }
@@ -41,7 +50,7 @@ func run(args []string, repo Repository) error {
 		task = strings.TrimSpace(task)
 		t, err := repo.Add(task)
 		if err != nil {
-			return err
+			return fmt.Errorf("add: %w", err)
 		}
 		fmt.Printf("добавлена задача %d %s", t.ID, t.Title+"\n")
 
@@ -71,7 +80,7 @@ func run(args []string, repo Repository) error {
 		}
 		err = repo.MarkDone(id)
 		if err != nil {
-			return err
+			return fmt.Errorf("done: %w", err)
 		}
 
 	case "delete":
@@ -84,7 +93,7 @@ func run(args []string, repo Repository) error {
 		}
 		err = repo.Delete(id)
 		if err != nil {
-			return err
+			return fmt.Errorf("delete: %w", err)
 		}
 	default:
 		return fmt.Errorf("неизвестная команда %q", args[0])

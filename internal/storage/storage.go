@@ -132,7 +132,7 @@ func (f *FileStorage) Add(title string) (Task, error) {
 		return Task{}, err
 	}
 	if err := f.save(); err != nil {
-		return Task{}, fmt.Errorf("save: %w", err)
+		return Task{}, fmt.Errorf("add: %w", err)
 	}
 	return t, nil
 }

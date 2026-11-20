@@ -102,7 +102,7 @@ func NewFileStorage(path string) (*FileStorage, error) {
 	data, err := os.ReadFile(path)
 	if errors.Is(err, os.ErrNotExist) {
 		return fs, nil
-	} else {
+	} else if err != nil {
 		return nil, fmt.Errorf("error: %w", err)
 	}
 	fd := fileData{}

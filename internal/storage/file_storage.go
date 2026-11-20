@@ -25,7 +25,7 @@ func NewFileStorage(path string) (*FileStorage, error) {
 	if errors.Is(err, os.ErrNotExist) {
 		return fs, nil
 	} else if err != nil {
-		return nil, fmt.Errorf("error: %w", err)
+		return nil, fmt.Errorf("read %s: %w", path, err)
 	}
 	fd := fileData{}
 	err = json.Unmarshal(data, &fd)
@@ -45,7 +45,10 @@ func (f *FileStorage) save() error {
 	if err != nil {
 		return fmt.Errorf("save %s: %w", f.path, err)
 	}
-	return os.WriteFile(f.path, data, 0644)
+	if err := os.WriteFile(f.path, data, 0644); err != nil {
+		return fmt.Errorf("write %s: %w", f.path, err)
+	}
+	return nil
 }
 
 func (f *FileStorage) Add(title string) (Task, error) {
@@ -54,7 +57,7 @@ func (f *FileStorage) Add(title string) (Task, error) {
 		return Task{}, err
 	}
 	if err := f.save(); err != nil {
-		return Task{}, fmt.Errorf("add: %w", err)
+		return Task{}, fmt.Errorf("save: %w", err)
 	}
 	return t, nil
 }
@@ -67,7 +70,7 @@ func (f *FileStorage) MarkDone(id int) error {
 		return err
 	}
 	if err := f.save(); err != nil {
-		return fmt.Errorf("Markdone %d: %w", id, err)
+		return fmt.Errorf("save %d: %w", id, err)
 	}
 	return nil
 }
@@ -77,7 +80,7 @@ func (f *FileStorage) Delete(id int) error {
 		return err
 	}
 	if err := f.save(); err != nil {
-		return fmt.Errorf("Delete %d: %w", id, err)
+		return fmt.Errorf("save %d: %w", id, err)
 	}
 	return nil
 }

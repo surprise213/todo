@@ -45,7 +45,7 @@ func (s *MemoryStorage) Get(id int) (Task, error) {
 			return task, nil
 		}
 	}
-	return Task{}, ErrNotFound
+	return Task{}, fmt.Errorf("task %d: %w", id, ErrNotFound)
 }
 
 func (s *MemoryStorage) MarkDone(id int) error {
@@ -55,7 +55,7 @@ func (s *MemoryStorage) MarkDone(id int) error {
 			return nil
 		}
 	}
-	return ErrNotFound
+	return fmt.Errorf("task %d: %w", id, ErrNotFound)
 }
 
 func (s *MemoryStorage) List() []Task {
@@ -71,7 +71,7 @@ func (s *MemoryStorage) Delete(id int) error {
 			return nil
 		}
 	}
-	return ErrNotFound
+	return fmt.Errorf("task %d: %w", id, ErrNotFound)
 }
 
 func (t Task) String() string {
